@@ -7,6 +7,9 @@ module Calculator
   # @param {String} start_key - either "rosteredStartTime" or "startTime"
   # @param {String} end_key - either "rosteredEndTime" or "endTime"
   # @return {Hash<Hash>}
+  # Takes in the raw shifts JSON of a single employee and then parses it, returning a Hash of 
+  # their start time, finish time, hours for each shift, pay for each shift, total hours and total pay. Also includes a user-friendly
+  # formatting of their shift hours.
   def self.calc_shift_data(shifts, start_key:, end_key:)
     total_shift_data = {}
     total_hours = 0

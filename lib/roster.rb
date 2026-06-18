@@ -3,6 +3,7 @@ require "fuzzy_match"
 module Roster
   # @param employees - the json of all employees and their shifts
   # @param {String} employee_name
+  # returns the full JSON of the **employee_name**'s shifts in the current collection of **employees**
   def self.shifts_for(employees, employee_name)
     employee = find_employee(employees, employee_name)
     shifts = employee&.dig("shifts")
@@ -13,6 +14,9 @@ module Roster
   # @param employees
   # @param {Hash<Hash>} employee_one_shifts
   # @param {Hash<Hash>} employee_two_shifts
+  # Compares the shifts contained inside **employee_one_shifts** and **employee_two_shifts** and prints out a formatted
+  # version of their shifts if they have any which overlap. Returns nil if either employee does not have any shifts. Puts a string confirming
+  # they will not see each other if no shifts overlap
   def self.find_shifts_in_common(employees, employee_one_shifts, employee_two_shifts)
     emp_one_name = employee_one_shifts[:name]
     emp_two_name = employee_two_shifts[:name]
@@ -39,6 +43,9 @@ module Roster
     puts "#{emp_one_name} and #{emp_two_name} will not see each other this week :(" unless found
   end
 
+  # @param employees - JSON collection of employees
+  # @param {Date} date - Requested day.
+  # Takes in a date object and finds the roster or projected roster for that day, then formats and returns it.
   def self.shifts_by_date(employees, date)
     result = []
     employees.each do |employee|

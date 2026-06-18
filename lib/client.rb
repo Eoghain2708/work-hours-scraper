@@ -27,6 +27,9 @@ class Client
   end
   
   private
+  # Sends env login data to the REST endpoint for the login page if loginToken does not exist in cache or is expired, then writes that token
+  # and its expiryTime to cache, then returns the token.
+  # If loginToken is already present in cache, simply returns the token.
   def login_and_get_token
     return cached_token if cached_token
 
