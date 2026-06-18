@@ -13,3 +13,9 @@ Can also check whether any shifts will overlap with a different employee
 ```
 shifts willsee JohnDoe JaneDoe nextweek
 ```
+Includes FuzzyMatch: 
+
+```
+# same output
+shifts willsee johnd jando nextweek
+```
