@@ -1,5 +1,5 @@
-# work-hours-scraper
-A Ruby scraper which automatically logs in and extracts data from a reverse-engineered API (from my workplace), saving a loginToken in JSON for repeat extractions. Can call a variety of commands to extract data from the current rota and the upcoming one including total hours, wage, projected hours/wage (for the next rota in its current state). 
+# shifts
+**shifts** is a Ruby scraper which automatically logs in and extracts data from a reverse-engineered API (from my workplace), saving a loginToken in JSON for repeat extractions. It can call a variety of commands to extract data from the current rota and the upcoming one including total hours, wage, projected hours/wage (for the next rota in its current state). 
 
 ## Commands
 There are three commands so far: hours, willsee, whosin.
@@ -16,11 +16,11 @@ def self.this_week
       today - ((today.wday - 5) % 7)
     end
     friday
-  end
+end
 
 def self.next_week
     this_week + 7
-  end
+end
 ```
 With this, we can simply call thisweek or nextweek with our hours command, combined with a name. With an ENV["MY_NAME"] set up, "me" can also be passed as an argument:
 
