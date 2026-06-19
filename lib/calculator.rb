@@ -21,7 +21,7 @@ module Calculator
         finish_time = info.dig(end_key, "orderableTime")
 
         hours = info.dig("netDuration", "decimal")
-        pay = (hours * HOURLY_WAGE).to_f.round(2)
+        pay = (hours * HOURLY_WAGE).to_f
         next if hours == 0
         total_hours += hours
         data[date] ||= []
@@ -38,7 +38,7 @@ module Calculator
       end
     end
     total_shift_data[:total_hours] = total_hours
-    total_shift_data[:pay_before_tax] = total_pay
+    total_shift_data[:pay_before_tax] = total_pay.round(2)
     total_shift_data
   end
 end

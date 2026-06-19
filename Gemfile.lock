@@ -15,9 +15,10 @@ DEPENDENCIES
   fuzzy_match
 
 CHECKSUMS
-  bigdecimal (4.1.2)
-  dotenv (3.2.0)
-  fuzzy_match (2.1.0)
+  bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
+  bundler (4.0.12) sha256=7f8b757d28dfb636e7b24fba2344ac6dd13b5b24f4b46d62573d483f211825ac
+  dotenv (3.2.0) sha256=e375b83121ea7ca4ce20f214740076129ab8514cd81378161f11c03853fe619d
+  fuzzy_match (2.1.0) sha256=e97e25d0eaee48a5f77ed970d007c7b6ff3c6a6858303fead2d1986859204dfc
 
 BUNDLED WITH
   4.0.12
