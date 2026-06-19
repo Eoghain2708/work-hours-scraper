@@ -25,22 +25,32 @@ module Roster
       puts "These workers will not see each other this week"
       return
     end
-    employee_one_shifts[:shifts].each do |k, v|
-      next unless employee_two_shifts[:shifts].keys.include?(k)
-      if employee_two_shifts[:shifts].keys.size == 0 && employee_one_shifts[:shifts].keys.size == 0
+    if employee_two_shifts[:shifts].empty? && employee_one_shifts[:shifts].empty?
         return "This rota appears not to be done yet. Check back later."
-      end
-      found = true
-      e2_shift = employee_two_shifts[:shifts][k]
-      if e2_shift[:finish] > v[:start] || e2_shift[:start] < v[:finish]
-        puts "Shift in common found! Date: #{Date.parse(k).strftime("%A %d %B %Y")}"
-        puts "-" * 30
-        puts "#{emp_one_name}'s shift: #{v[:pretty_shift]}"
-        puts "#{emp_two_name}'s shift: #{e2_shift[:pretty_shift]}"
-        puts "-" * 30
-      end
     end
-    puts "#{emp_one_name} and #{emp_two_name} will not see each other this week :(" unless found
+    employee_one_shifts[:shifts].each do |date, emp1_day|
+      emp2_day = employee_two_shifts[:shifts][date]
+      next unless emp2_day
+      emp1_day.each do |shift1|
+        emp2_day.each do |shift2|
+          if shift1[:start] < shift2[:finish] && shift2[:start] < shift1[:finish]
+            found = true
+            overlap_start = [shift1[:start], shift2[:start]].max
+            overlap_end = [shift1[:finish], shift2[:finish]].min
+            overlap = overlap_end - overlap_start
+            puts "Shift in common found! Date: #{Date.parse(date).strftime("%A %d %B %Y")}"
+            puts "-" * 30
+            puts "#{emp_one_name}'s shift: #{shift1[:pretty_shift]}"
+            puts "#{emp_two_name}'s shift: #{shift2[:pretty_shift]}"
+            puts "Overlap: #{overlap} hours"
+            puts "-" * 30
+          end
+        end
+      end
+      puts "#{emp_one_name} and #{emp_two_name} will not see each other this week :(" unless found
+    end
+      
+     
   end
 
   # @param employees - JSON collection of employees
@@ -49,25 +59,25 @@ module Roster
   def self.shifts_by_date(employees, date)
     result = []
     employees.each do |employee|
-      shifts = shifts_for(employees, employee["displayName"])
+      shifts = employee["shifts"]
       shifts.each_with_object({}) do |(shift_date, data), hash|
         next unless shift_date == date.to_s
-        data = data[0]
-
-        # startTime listed as 24 sometimes in shift data if shift data exists but no shift actually occurred. 
-        next if data.dig("startTime", "orderableTime") == 24
-        hash[:name] = employee["displayName"]
-        hash[:date] = Date.parse(shift_date).strftime("%A %d %B %Y")
-        hash[:start_time] = data.dig("startTime", "orderableTime")
-        hash[:end_time] = data.dig("endTime", "orderableTime")
-        hash[:pretty_print] = data.dig("shiftText", "time12Hr")
+        ## data includes shifts for the day, so |d| exists in case there are multiple shifts in one day (employee doing split shifts)
+        data.each do |d|
+          # startTime listed as 24 sometimes in shift data if shift data exists but no shift actually occurred. 
+          next if d.dig("startTime", "orderableTime") == 24
+          hash[:name] = employee["displayName"]
+          hash[:date] = Date.parse(shift_date).strftime("%A %d %B %Y")
+          (hash[:start_time] ||= []) << d.dig("startTime", "orderableTime")
+          (hash[:end_time]   ||= []) << d.dig("endTime", "orderableTime")
+          (hash[:pretty_print] ||= []) << d.dig("shiftText", "time12Hr")
+        end
+        pp hash
         result << hash
       end
     end
     result
   end
-
- 
 
   private
 
@@ -79,6 +89,4 @@ module Roster
     return nil unless employee
     employee
   end
-
-  
 end

@@ -1,3 +1,4 @@
+require "bundler/setup"
 require "dotenv"
 Dotenv.load(File.expand_path("../.env", __dir__))
 

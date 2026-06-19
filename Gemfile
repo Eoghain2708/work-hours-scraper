@@ -4,5 +4,6 @@ source "https://rubygems.org"
 
 # gem "rails"
 
-gem "ruby-lsp", "~> 0.26.9"
-gem "solargraph", "~> 0.60.0"
+gem "fuzzy_match"
+gem "dotenv"
+gem "bigdecimal"
