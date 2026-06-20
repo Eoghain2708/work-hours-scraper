@@ -47,7 +47,7 @@ module Calculator
     total_shift_data[:pay_before_tax] = total_pay.round(2)
     total_shift_data
   end
-  private
+  
   private
   def self.base_hourly_wage(age)
     # we don't hire < 18
