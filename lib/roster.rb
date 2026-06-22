@@ -38,7 +38,7 @@ module Roster
       next unless emp2_day
       emp1_day.each do |shift1|
         emp2_day.each do |shift2|
-          if shift1[:start] < shift2[:finish] && shift2[:start] < shift1[:finish]
+          if overlap?(shift1, shift2)
             found = true
             overlap_start = [shift1[:start], shift2[:start]].max
             overlap_end = [shift1[:finish], shift2[:finish]].min
@@ -73,17 +73,22 @@ module Roster
           next if d.dig("startTime", "orderableTime") == 24
           hash[:name] = employee["displayName"]
           hash[:date] = Date.parse(shift_date).strftime("%A %d %B %Y")
-          (hash[:start_time] ||= []) << d.dig("startTime", "orderableTime")
-          (hash[:end_time]   ||= []) << d.dig("endTime", "orderableTime")
+          (hash[:start] ||= []) << d.dig("startTime", "orderableTime")
+          (hash[:finish] ||= []) << d.dig("endTime", "orderableTime")
           (hash[:pretty_print] ||= []) << d.dig("shiftText", "time12Hr")
         end
         result << hash
       end
     end
-    result
+    result.reject(&:empty?)
   end
 
-  private
+  def self.find_employee_no_match(employees, employee_name)
+    employees.each do |e|
+      return e if e["displayName"].downcase == employee_name.downcase
+    end
+    return nil
+  end
 
   # @param {Array} employees, list of employees in JSON
   # @param {String} employee_name, targeted employee
@@ -92,5 +97,10 @@ module Roster
     employee = matcher.find(employee_name)
     return nil unless employee
     employee
+  end
+
+  private
+  def self.overlap?(shift_one, shift_two)
+    return shift_one[:start] < shift_two[:finish] && shift_two[:start] < shift_one[:finish]
   end
 end

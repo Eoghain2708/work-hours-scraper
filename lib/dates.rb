@@ -14,6 +14,10 @@ module Dates
   def self.next_week
     this_week + 7
   end
+  
+  def self.last_week
+    this_week - 7
+  end
 
   def self.today
     Date.today

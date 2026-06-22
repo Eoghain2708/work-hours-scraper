@@ -1,7 +1,7 @@
 require_relative "shifts"
 require "date"
 class CLI
-  ALLOWED_COMMANDS = ["hours", "willsee", "whosin"]
+  ALLOWED_COMMANDS = ["hours", "willsee", "whosin", "lifetime"]
   # available commands
   # shifts hours me thisweek/nextweek
   # shifts hours name thisweek/nextweek
@@ -14,7 +14,7 @@ class CLI
     begin
       date = define_period(period)
     rescue Date::Error
-      abort "Expected thisweek, nextweek, today, tomorrow or a valid date YYYY-mm-dd for final argument"
+      abort "Expected thisweek, nextweek, lastweek, today, tomorrow or a valid date YYYY-mm-dd for final argument"
     end
 
     client = Client.new
@@ -27,6 +27,8 @@ class CLI
       willsee(employees, argv)
     when "whosin"
       whosin(employees, date)
+    when "lifetime"
+      lifetime(employees, argv.last, date, client)
     else 
       abort "Unknown command: #{command}"
     end
@@ -46,6 +48,8 @@ class CLI
       Dates.today
     when "tomorrow"
       Dates.tomorrow
+    when "lastweek"
+      Dates.last_week
     else
       Dates.parse_arg(period)
     end
@@ -69,12 +73,20 @@ class CLI
     p1_data = Calculator.calc_shift_data(Roster.shifts_for(employees, p1), start_key: "startTime", end_key: "endTime")
     p2_data = Calculator.calc_shift_data(Roster.shifts_for(employees, p2), start_key: "startTime", end_key: "endTime")
     Roster.find_shifts_in_common(employees, p1_data, p2_data)
+
   end
 
   def self.whosin(employees, date)
     shifts = Roster.shifts_by_date(employees, date)
+    pp shifts
     shifts.each do |shift|
       ShiftFormatter.format_shift(shift)
     end
+  end
+
+  def self.lifetime(employees, name, date, client)
+    employee = Roster.find_employee(employees, name)
+    data = Analytics.calc_lifetime_data(employees, name, date, client)
+    pp data
   end
 end

@@ -3,12 +3,10 @@ require "json"
 require "time"
 require "fileutils"
 require "dotenv"
+require_relative "cache"
 
 class Client
   LOGIN_URL = ENV["LOGIN_URL"]
-  
-  CACHE_DIR = File.join(Dir.home, ".cache", "shifts")
-  CACHE_FILE = File.join(CACHE_DIR, "token.json")
 
   # @params  date
   # returns json of employees for the week of __date__
@@ -22,7 +20,12 @@ class Client
       http.request(roster_request)
     end
     
-    body = JSON.parse(roster_response.body)
+    begin
+      body = JSON.parse(roster_response.body)
+    rescue => e 
+      puts e
+    end
+
     body["employees"]
   end
   
@@ -49,23 +52,21 @@ class Client
 
     body = JSON.parse(response.body)
 
-    FileUtils.mkdir_p(CACHE_DIR)
-    puts "writing to #{CACHE_FILE}"
+    
+    Cache.write("token.json",
+    JSON.pretty_generate(
+      loginToken: body["loginToken"],
+      expiryTime: body["expiryTime"]
+    ))
 
-    File.write(
-      CACHE_FILE,
-      JSON.pretty_generate(
-        loginToken: body["loginToken"],
-        expiryTime: body["expiryTime"]
-      )
-    )
+
     body["loginToken"]
   end
 
   def cached_token
-    return nil unless File.exist?(CACHE_FILE)
-    return nil if File.zero?(CACHE_FILE)
-    cache = JSON.parse(File.read(CACHE_FILE))
+    return nil unless Cache.exist?("token.json")
+    return nil if Cache.empty?("token.json")
+    cache = JSON.parse(Cache.read("token.json"))
 
     return nil if Time.now.to_i * 1000 >= cache["expiryTime"]
 

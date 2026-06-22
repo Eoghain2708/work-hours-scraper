@@ -1,5 +1,7 @@
 require "bigdecimal"
 require "dotenv"
+require "date"
+require "net/http"
 
 module Calculator
   HOURLY_WAGE_UNDER_21 = BigDecimal("10.85")
@@ -47,8 +49,7 @@ module Calculator
     total_shift_data[:pay_before_tax] = total_pay.round(2)
     total_shift_data
   end
-  
-  private
+
   def self.base_hourly_wage(age)
     # we don't hire < 18
     return HOURLY_WAGE_UNDER_21 if age < 21
