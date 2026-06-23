@@ -3,6 +3,10 @@ require "date"
 module ShiftFormatter
   # @param {Hash} shift_data - must contain keys :name, :shifts, :pay_before_tax
   def self.format_shift_data(shift_data)
+    unless shift_data && shift_data[:shifts]
+      puts "No shifts rostered yet"
+      return
+    end
     puts "-" * 40
     puts "Shifts for #{shift_data[:name]}"
     puts "Role: #{shift_data[:role]}"
@@ -22,7 +26,7 @@ module ShiftFormatter
   # Used to print a single shift with these keys rather than full saturated data (which is used in the shifts hours command)
   # This method is used to format shifts returned from the whosin command
   def self.format_shift(shift)
-    return unless shift && shift[:shifts]
+    return unless shift && shift[:shifts].size > 0
     puts "-" * 20
     puts "Name: #{shift[:name]}" 
     if shift[:shifts].size > 1

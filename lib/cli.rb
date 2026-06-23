@@ -85,7 +85,6 @@ class CLI
   end
 
   def self.hours(argv)
-    abort "Invalid format, should be shifts hours NAME thisweek/nextweek" unless ["thisweek", "nextweek"].include?(argv.last.downcase)
     date = get_date(argv.pop)
     employees = get_employees(date)
     if argv[0].downcase == "me"

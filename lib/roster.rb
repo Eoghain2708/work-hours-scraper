@@ -50,8 +50,8 @@ module Roster
           end
         end
       end
-      puts "#{emp_one_name} and #{emp_two_name} will not see each other this week :(" unless found
     end
+    puts "#{emp_one_name} and #{emp_two_name} will not see each other this week :(" unless found
   end
 
   def self.calc_overlap(shift1, shift2)
