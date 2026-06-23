@@ -20,12 +20,14 @@ class Client
       http.request(roster_request)
     end
     
-    begin
-      body = JSON.parse(roster_response.body)
-    rescue => e 
-      puts e
+    unless roster_response.is_a?(Net::HTTPSuccess)
+      raise "HTTP #{roster_response.code}: #{roster_response.body[0,200]}"
     end
 
+    unless roster_response["content-type"]&.include?("application/json")
+      raise "Expected JSON, got #{roster_response['content-type']}"
+    end
+    body = JSON.parse(roster_response.body)
     body["employees"]
   end
   

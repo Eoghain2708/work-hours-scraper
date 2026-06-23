@@ -80,7 +80,7 @@ module Roster
         result << hash
       end
     end
-    result.reject(&:empty?)
+    result.reject(&:empty?).sort_by! { |h| h[:shifts].first[:start]}
   end
 
   def self.find_employee_no_match(employees, employee_name)

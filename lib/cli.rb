@@ -1,7 +1,8 @@
 require_relative "shifts"
 require "date"
 class CLI
-  ALLOWED_COMMANDS = ["hours", "willsee", "whosin", "lifetime", "glifetime"]
+  ALLOWED_COMMANDS = ["hours", "willsee", "whosin", "lifetime", "glifetime", "help"]
+  
   # available commands
   # shifts hours me thisweek/nextweek
   # shifts hours name thisweek/nextweek
@@ -9,28 +10,22 @@ class CLI
   def self.run(argv)
     command = argv.shift ## ARGV now contains remaining data 
     abort "Invalid command" unless ALLOWED_COMMANDS.include?(command.downcase)
-    period = argv.pop.downcase
-
-    begin
-      date = define_period(period)
-    rescue Date::Error
-      abort "Expected thisweek, nextweek, lastweek, today, tomorrow or a valid date YYYY-mm-dd for final argument"
-    end
-
-    client = Client.new
-    employees = client.get_employees(date)
+    
+   
     
     case command
     when "hours"
-      hours(employees, argv)
+      hours(argv)
     when "willsee"
-      willsee(employees, argv)
+      willsee(argv)
     when "whosin"
-      whosin(employees, date)
+      whosin(argv)
     when "glifetime"
-      glifetime(employees, argv.last, date, client)
+      glifetime(argv)
     when "lifetime"
-      lifetime(argv.last)
+      lifetime(argv)
+    when "help"
+      help
     else 
       abort "Unknown command: #{command}"
     end
@@ -50,15 +45,49 @@ class CLI
       Dates.today
     when "tomorrow"
       Dates.tomorrow
+    when "yesterday"
+      Dates.yesterday
     when "lastweek"
       Dates.last_week
+    when "friday", "fri"
+      Dates.friday
+    when "saturday", "sat"
+      Dates.saturday
+    when "sunday", "sun"
+      Dates.sunday
+    when "monday", "mon"
+      Dates.monday
+    when "tuesday", "tue"
+      Dates.tuesday
+    when "wednesday", "wed"
+      Dates.wednesday
+    when "thursday", "thu"
+      Dates.thursday
+
+    # next week
+    when "nfriday", "nfri"
+      Dates.nfriday
+    when "nsaturday", "nsat"
+      Dates.nsaturday
+    when "nsunday", "nsun"
+      Dates.nsunday
+    when "nmonday", "nmon"
+      Dates.nmonday
+    when "ntuesday", "ntue"
+      Dates.ntuesday
+    when "nwednesday", "nwed"
+      Dates.nwednesday
+    when "nthursday", "nthu"
+      Dates.nthursday
     else
       Dates.parse_arg(period)
     end
   end
 
-  def self.hours(employees, argv)
-    abort "Invalid format, should be shifts hours NAME thisweek/nextweek" unless argv.size == 1
+  def self.hours(argv)
+    abort "Invalid format, should be shifts hours NAME thisweek/nextweek" unless ["thisweek", "nextweek"].include?(argv.last.downcase)
+    date = get_date(argv.pop)
+    employees = get_employees(date)
     if argv[0].downcase == "me"
       shifts = Roster.shifts_for(employees, ENV["MY_NAME"])
     else
@@ -68,7 +97,10 @@ class CLI
     ShiftFormatter.format_shift_data(shift_data)
   end
 
-  def self.willsee(employees, argv)
+  def self.willsee(argv)
+    pp argv
+    date = get_date(argv.pop)
+    employees = get_employees(date)
     abort "Invalid format, format must be shifts willsee NAME NAME thisweek/nextweek" unless argv.size == 2
     p1 = argv[0].downcase
     p2 = argv[1].downcase
@@ -78,20 +110,57 @@ class CLI
 
   end
 
-  def self.whosin(employees, date)
+  def self.whosin(argv)
+    date = get_date(argv.last)
+    employees = get_employees(date)
     shifts = Roster.shifts_by_date(employees, date)
+    pp shifts
     shifts.each do |shift|
       ShiftFormatter.format_shift(shift)
     end
   end
 
-  def self.glifetime(employees, name, date, client)
+  def self.glifetime(argv)
+    date = get_date(argv.pop)
+    name = argv.pop
+    client = Client.new
+    employees = client.get_employees(date)
     data = Analytics.calc_lifetime_data(employees, name, date, client)
     pp data
   end
 
-  def self.lifetime(employee_name)
-    data = Analytics.retrieve_lifetime_data(employee_name)
+  def self.lifetime(argv)
+    name = argv.last
+    data = Analytics.retrieve_lifetime_data(name)
     pp data
   end
+
+  def self.help
+    
+  end
+
+  private
+  def self.get_date(input)
+    date = define_period(input)
+  rescue Date::Error
+    abort "Invalid date input. Type 'shifts help' for help."
+    date
+  end
+
+  def self.get_employees(date)
+    client = Client.new
+    employees = client.get_employees(date)
+    employees
+  end
+
+
+
+   # begin
+    #   date = define_period(period)
+    # rescue Date::Error
+    #   abort "Expected thisweek, nextweek, lastweek, today, tomorrow or a valid date YYYY-mm-dd for final argument"
+    # end
+
+    # client = Client.new
+    # employees = client.get_employees(date)
 end
