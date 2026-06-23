@@ -37,17 +37,17 @@ class CLI
   def self.define_period(period)
     period = period.strip.downcase
     case period
-    when "thisweek"
+    when "thisweek", "tweek"
       Dates.this_week
-    when "nextweek"
+    when "nextweek", "nweek"
       Dates.next_week
-    when "today"
+    when "today", "tod"
       Dates.today
-    when "tomorrow"
+    when "tomorrow", "tom"
       Dates.tomorrow
-    when "yesterday"
+    when "yesterday", "yes"
       Dates.yesterday
-    when "lastweek"
+    when "lastweek", "lweek"
       Dates.last_week
     when "friday", "fri"
       Dates.friday
@@ -114,7 +114,6 @@ class CLI
     date = get_date(argv.last)
     employees = get_employees(date)
     shifts = Roster.shifts_by_date(employees, date)
-    pp shifts
     shifts.each do |shift|
       ShiftFormatter.format_shift(shift)
     end
