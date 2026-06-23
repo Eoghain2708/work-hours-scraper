@@ -22,16 +22,16 @@ module ShiftFormatter
   # Used to print a single shift with these keys rather than full saturated data (which is used in the shifts hours command)
   # This method is used to format shifts returned from the whosin command
   def self.format_shift(shift)
-    return unless shift && shift[:pretty_print]
+    return unless shift && shift[:shifts]
     puts "-" * 20
     puts "Name: #{shift[:name]}" 
-    if shift[:pretty_print].size > 1
+    if shift[:shifts].size > 1
       puts "Shifts"
-      shift[:pretty_print].each_with_index do |s, i|
-        puts "#{i + 1}: #{s}"
+      shift[:shifts].each_with_index do |s, i|
+        puts "#{i + 1}: #{s[:pretty_print]}"
       end
     else 
-      puts "Shift: #{shift[:pretty_print].first}"
+      puts "Shift: #{shift[:shifts].first[:pretty_print]}"
     end
     
     puts "Date: #{shift[:date]}"

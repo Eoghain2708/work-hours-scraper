@@ -75,9 +75,7 @@ module Roster
           next if d.dig("startTime", "orderableTime") == 24
           hash[:name] = employee["displayName"]
           hash[:date] = Date.parse(shift_date).strftime("%A %d %B %Y")
-          (hash[:start] ||= []) << d.dig("startTime", "orderableTime")
-          (hash[:finish] ||= []) << d.dig("endTime", "orderableTime")
-          (hash[:pretty_print] ||= []) << d.dig("shiftText", "time12Hr")
+          (hash[:shifts] ||= []) << {start: d.dig("startTime", "orderableTime"), finish: d.dig("endTime", "orderableTime"), pretty_print: d.dig("shiftText", "time12Hr")}
         end
         result << hash
       end
@@ -101,7 +99,7 @@ module Roster
     employee
   end
 
-  private
+  
   def self.overlap?(shift1, shift2)
     shift1[:start] < shift2[:finish] && shift1[:finish] > shift2[:start]
   end

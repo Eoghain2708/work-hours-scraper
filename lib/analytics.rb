@@ -72,22 +72,24 @@ module Analytics
       target["shifts"].each do |shift_date, data|
         people = []
         roster = Roster.shifts_by_date(weekly_rota, shift_date)
-        roster.each do |person|
-          people << person[:name] unless person[:name] == name
-        end
+        target_shift_data = {}
         data.each do |d|
-          result[:shifts] << { 
-            date: Date.parse(shift_date),
-            shift: d.dig("rosteredShiftText", "time12Hr"),
-            start: d.dig("startTime", "orderableTime"),
-            finish: d.dig("endTime", "orderableTime"),
-            hours: d.dig("netDuration", "decimal"),
-            job_code: d.dig("job", "id"),
-            age: age,
-            people: people,
-            pay: ((Calculator.calc_hourly_wage({age: age, job_code: d.dig("job", "id")})) * d.dig("netDuration", "decimal")).to_f.round(2)
-        }
+          target_shift_data[:date] = Date.parse(shift_date)
+          target_shift_data[:shift] = d.dig("rosteredShiftText", "time12Hr")
+          target_shift_data[:start] = d.dig("startTime", "orderableTime")
+          target_shift_data[:finish] = d.dig("endTime", "orderableTime")
+          target_shift_data[:hours] = d.dig("netDuration", "decimal")
+          target_shift_data[:job_code] = d.dig("job", "id")
+          target_shift_data[:age] = age
+          target_shift_data[:pay] = ((Calculator.calc_hourly_wage({age: age, job_code: d.dig("job", "id")})) * d.dig("netDuration", "decimal")).to_f.round(2)
         end
+        roster.each do |person|
+          person[:shifts].each do |s|
+            (people << person[:name] unless person[:name] == name) if Roster.overlap?(target_shift_data, s)
+         end
+        end
+         target_shift_data[:people] = people
+         result[:shifts] << target_shift_data
       end
       date -= 7
       
