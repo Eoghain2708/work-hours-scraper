@@ -1,5 +1,7 @@
 require_relative "client"
 require "fuzzy_match"
+require "tty-table"
+
 module Roster
   # @param employees - the json of all employees and their shifts
   # @param {String} employee_name
@@ -69,12 +71,14 @@ module Roster
       shifts = employee["shifts"]
       shifts.each_with_object({}) do |(shift_date, data), hash|
         next unless shift_date == date.to_s
+        parsed_date = Date.parse(shift_date)
         ## data includes shifts for the day, so |d| exists in case there are multiple shifts in one day (employee doing split shifts)
         data.each do |d|
           # startTime listed as 24 sometimes in shift data if shift data exists but no shift actually occurred. 
           next if d.dig("startTime", "orderableTime") == 24
           hash[:name] = employee["displayName"]
-          hash[:date] = Date.parse(shift_date).strftime("%A %d %B %Y")
+          hash[:orderable_date] = parsed_date
+          hash[:date] = parsed_date.strftime("%A %d %B %Y")
           (hash[:shifts] ||= []) << {start: d.dig("startTime", "orderableTime"), finish: d.dig("endTime", "orderableTime"), pretty_print: d.dig("shiftText", "time12Hr")}
         end
         result << hash
@@ -102,5 +106,39 @@ module Roster
   
   def self.overlap?(shift1, shift2)
     shift1[:start] < shift2[:finish] && shift1[:finish] > shift2[:start]
+  end
+
+  def self.generate_roster_table(roster_data, start_date)
+    week = (0..6).map { |i| start_date + i }
+    table = TTY::Table.new(header: ["Name", "Fri", "Sat", "Sun", "Mon", "Tue", "Wed", "Thu"])
+    roster_data.each do |name, days|
+      day_lookup = days.to_h { |day| [day[:orderable_date], day] }
+ 
+      row = [name]
+      week.each do |day|
+        shift = day_lookup[day]
+        if shift
+          row << shift[:shifts].map { |s| s[:pretty_print] }.join(' | ')
+        else 
+          row << ""
+        end
+      end
+      table << row
+      table << [""] * row.size
+    end
+    puts table.render(:unicode, resize: true)
+  end
+
+  def self.full_roster_info(employees, date)
+    finish_date = date + 6
+    result = []
+    while date <= finish_date 
+      data = shifts_by_date(employees, date)
+      result << data
+      date += 1
+    end
+    result.flatten!
+    grouped = result.group_by { |h| h[:name]}
+    grouped
   end
 end

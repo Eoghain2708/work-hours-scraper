@@ -23,6 +23,8 @@ class CLI
       lifetime(argv)
     when "help", "h"
       help
+    when "rota", "r"
+      rota(argv)
     else 
       abort "Unknown command: #{command}"
     end
@@ -128,6 +130,14 @@ class CLI
     name = argv.last
     data = Analytics.retrieve_lifetime_data(name)
     pp data
+  end
+
+  def self.rota(argv)
+    date = get_date(argv.pop)
+    client = Client.new
+    employees = client.get_employees(date)
+    data = Roster.full_roster_info(employees, date)
+    Roster.generate_roster_table(data, date)
   end
 
   def self.help

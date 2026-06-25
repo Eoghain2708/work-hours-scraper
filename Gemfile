@@ -7,3 +7,5 @@ source "https://rubygems.org"
 gem "fuzzy_match"
 gem "dotenv"
 gem "bigdecimal"
+
+gem "tty-table", "~> 0.12.0"
