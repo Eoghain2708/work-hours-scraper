@@ -87,6 +87,34 @@ module Dates
     next_week + 6
   end
 
+  def self.lthursday 
+    this_week - 1
+  end
+
+  def self.lwednesday
+    this_week - 2
+  end
+
+  def self.ltuesday 
+    this_week - 3
+  end
+
+  def self.lmonday
+    this_week - 4
+  end
+
+  def self.lsunday
+    this_week - 5
+  end
+
+  def self.lsaturday
+    this_week - 6
+  end
+
+  def self.lfriday
+    this_week - 7
+  end
+
   def self.parse_arg(date_string)
     Date.parse(date_string)
   end

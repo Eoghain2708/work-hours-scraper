@@ -1,24 +1,26 @@
 require "date"
+require "pastel"
 
 module ShiftFormatter
+  PASTEL = Pastel.new
   # @param {Hash} shift_data - must contain keys :name, :shifts, :pay_before_tax
   def self.format_shift_data(shift_data)
     unless shift_data && shift_data[:shifts]
-      puts "No shifts rostered yet"
+      puts PASTEL.red "No shifts rostered yet"
       return
     end
     puts "-" * 40
-    puts "Shifts for #{shift_data[:name]}"
-    puts "Role: #{shift_data[:role]}"
-    puts "Hourly wage: £#{shift_data[:hourly_wage]}" 
+    puts "Shifts for #{PASTEL.cyan.bold(shift_data[:name])}"
+    puts "Role: #{PASTEL.bright_yellow.bold(shift_data[:role])}"
+    puts "Hourly wage: £#{PASTEL.green.bold shift_data[:hourly_wage]}" 
     shift_data[:shifts].each do |shift, info|
       info.each do |i|
         pretty_print_shift_data(shift, i)
       end
     end
     puts "-" * 15
-    puts "Total hours: #{shift_data[:total_hours]}"
-    puts "Total pay before tax: £#{shift_data[:pay_before_tax]}"
+    puts PASTEL.bold.bright_cyan "Total hours: #{shift_data[:total_hours]}"
+    puts PASTEL.bright_green "Total pay before tax: £#{PASTEL.bold.bright_green shift_data[:pay_before_tax]}"
     puts "-" * 40
   end
 
@@ -28,17 +30,17 @@ module ShiftFormatter
   def self.format_shift(shift)
     return unless shift && shift[:shifts].size > 0
     puts "-" * 20
-    puts "Name: #{shift[:name]}" 
+    puts "#{PASTEL.bright_green.bold "Name:"} #{PASTEL.bold shift[:name]}" 
     if shift[:shifts].size > 1
-      puts "Shifts"
+      puts PASTEL.bright_green.bold "Shifts"
       shift[:shifts].each_with_index do |s, i|
-        puts "#{i + 1}: #{s[:pretty_print]}"
+        puts "#{PASTEL.bright_green.bold i + 1}: #{PASTEL.white.bold s[:pretty_print]}"
       end
     else 
-      puts "Shift: #{shift[:shifts].first[:pretty_print]}"
+      puts "#{PASTEL.bright_green.bold "Shift:"} #{PASTEL.bold shift[:shifts].first[:pretty_print]}"
     end
     
-    puts "Date: #{shift[:date]}"
+    puts PASTEL.bright_green.bold "Date: #{PASTEL.white.bold shift[:date]}"
     puts "-" * 20
   end
 
@@ -47,9 +49,9 @@ module ShiftFormatter
   def self.pretty_print_shift_data(shift, info)
     puts "*" * 40
       puts "-" * 10
-      puts "date: #{Date.parse(shift).strftime("%A %d %B %Y")}"
+      puts "#{PASTEL.bright_blue "date"}: #{PASTEL.bright_magenta.bold Date.parse(shift).strftime("%A %d %B %Y")}"
      info.each do |k, v|
-       puts "#{k}: #{v}"
+       puts "#{PASTEL.bright_blue k}: #{PASTEL.bright_magenta.bold v}"
      end
   end
 end
