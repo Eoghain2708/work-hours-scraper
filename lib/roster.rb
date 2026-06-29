@@ -117,6 +117,11 @@ module Roster
   end
 
   def self.generate_roster_table(roster_data, start_date)
+    if roster_data.empty?
+      puts "The roster for next week has not been started."
+      return 
+    end
+
     make_friday!(start_date)
     week = (0..6).map { |i| start_date + i }
     table = TTY::Table.new(header: ["Name", "Fri", "Sat", "Sun", "Mon", "Tue", "Wed", "Thu"])
