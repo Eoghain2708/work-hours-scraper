@@ -116,7 +116,6 @@ class CLI
   end
 
   def self.willsee(argv)
-    pp argv
     date = get_date(argv.pop)
     employees = get_employees(date)
     abort "Invalid format, format must be shifts willsee NAME NAME thisweek/nextweek" unless argv.size == 2
@@ -124,8 +123,8 @@ class CLI
     p2 = argv[1].downcase
     p1_data = Calculator.calc_shift_data(Roster.shifts_for(employees, p1), start_key: "startTime", end_key: "endTime")
     p2_data = Calculator.calc_shift_data(Roster.shifts_for(employees, p2), start_key: "startTime", end_key: "endTime")
-    Roster.find_shifts_in_common(employees, p1_data, p2_data)
-
+    result = Roster.find_shifts_in_common(employees, p1_data, p2_data)
+    ShiftFormatter.format_shifts_in_common(result)
   end
 
   def self.whosin(argv)

@@ -54,7 +54,6 @@ module Calculator
     total_shift_data[:total_hours] = total_hours
     total_shift_data[:pay_before_tax] = total_pay.round(2)
     total_shift_data[:pay_before_tax] = total_pay.round(2)
-    pp total_shift_data
     total_shift_data
   end
 

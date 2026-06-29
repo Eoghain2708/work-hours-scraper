@@ -44,6 +44,29 @@ module ShiftFormatter
     puts "-" * 20
   end
 
+  def self.format_shifts_in_common(result)
+    not_found = result.first[:message]
+    if not_found
+      puts not_found
+      return
+    end
+    result.each do |hash|
+      shifts = hash[:shifts]
+      format_shift_in_common(shifts)
+    end
+  end
+
+
+  private 
+  def self.format_shift_in_common(shifts)
+    puts "#{PASTEL.green.bold "Shift in common found!"}" + " #{PASTEL.bold "Date:"} #{PASTEL.bright_red.bold Date.parse(shifts[:date]).strftime("%A %d %B %Y")}"
+    puts "-" * 30
+    puts "#{PASTEL.bold PASTEL.bright_cyan shifts[:shift_one_name]}: #{PASTEL.bold shifts[:shift_one]}"
+    puts "#{PASTEL.bold PASTEL.bright_yellow shifts[:shift_two_name]}: #{PASTEL.bold shifts[:shift_two]}"
+    puts "#{PASTEL.bold PASTEL.bright_magenta "Overlap:"} #{PASTEL.bold shifts[:overlap]} hours"
+    puts "-" * 30
+  end
+
 
   private 
   def self.pretty_print_shift_data(shift, info)

@@ -28,6 +28,7 @@ module Roster
     emp_one_name = employee_one_shifts[:name]
     emp_two_name = employee_two_shifts[:name]
     found = false
+    result = []
     if !employee_one_shifts[:shifts] || !employee_two_shifts[:shifts]
       puts "These workers will not see each other this week"
       return
@@ -43,17 +44,20 @@ module Roster
           if overlap?(shift1, shift2)
             found = true
             overlap = calc_overlap(shift1, shift2)
-            puts "Shift in common found! Date: #{Date.parse(date).strftime("%A %d %B %Y")}"
-            puts "-" * 30
-            puts "#{emp_one_name}'s shift: #{shift1[:pretty_shift]}"
-            puts "#{emp_two_name}'s shift: #{shift2[:pretty_shift]}"
-            puts "Overlap: #{overlap} hours"
-            puts "-" * 30
+            result << { shifts: 
+            { 
+              date: date, 
+              shift_one: shift1[:pretty_shift], shift_one_name: emp_one_name,
+              shift_two: shift2[:pretty_shift], shift_two_name: emp_two_name,
+              overlap: overlap
+              } 
+            }
           end
         end
       end
     end
-    puts "#{emp_one_name} and #{emp_two_name} will not see each other this week :(" unless found
+    return [ message: "#{emp_one_name} and #{emp_two_name} will not see each other this week :(" ] unless found
+    result
   end
 
   def self.calc_overlap(shift1, shift2)
