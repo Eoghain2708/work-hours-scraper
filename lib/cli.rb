@@ -41,25 +41,25 @@ class CLI
     case period
     when "thisweek", "tweek", "tw"
       Dates.this_week
-    when "today", "tod"
+    when "today", "tod", "td"
       Dates.today
     when "tomorrow", "tom"
       Dates.tomorrow
     when "yesterday", "yes"
       Dates.yesterday
-    when "friday", "fri"
+    when "friday", "fri", "tfri"
       Dates.friday
-    when "saturday", "sat"
+    when "saturday", "sat", "tsat"
       Dates.saturday
-    when "sunday", "sun"
+    when "sunday", "sun", "tsun"
       Dates.sunday
-    when "monday", "mon"
+    when "monday", "mon", "tmon"
       Dates.monday
-    when "tuesday", "tue"
+    when "tuesday", "tue", "ttue"
       Dates.tuesday
-    when "wednesday", "wed"
+    when "wednesday", "wed", "twed"
       Dates.wednesday
-    when "thursday", "thu"
+    when "thursday", "thu", "tthu"
       Dates.thursday
 
     # next week
