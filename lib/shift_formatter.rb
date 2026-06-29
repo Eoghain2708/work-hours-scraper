@@ -6,13 +6,13 @@ module ShiftFormatter
   # @param {Hash} shift_data - must contain keys :name, :shifts, :pay_before_tax
   def self.format_shift_data(shift_data)
     unless shift_data && shift_data[:shifts]
-      puts PASTEL.red "No shifts rostered yet"
+      puts PASTEL.bright_red.bold "No shifts rostered yet"
       return
     end
     puts "-" * 40
     puts "Shifts for #{PASTEL.cyan.bold(shift_data[:name])}"
     puts "Role: #{PASTEL.bright_yellow.bold(shift_data[:role])}"
-    puts "Hourly wage: £#{PASTEL.green.bold shift_data[:hourly_wage]}" 
+    puts "Hourly wage: #{PASTEL.green.bold ("£#{shift_data[:hourly_wage]}")}" 
     shift_data[:shifts].each do |shift, info|
       info.each do |i|
         pretty_print_shift_data(shift, i)
@@ -20,7 +20,7 @@ module ShiftFormatter
     end
     puts "-" * 15
     puts PASTEL.bold.bright_cyan "Total hours: #{shift_data[:total_hours]}"
-    puts PASTEL.bright_green "Total pay before tax: £#{PASTEL.bold.bright_green shift_data[:pay_before_tax]}"
+    puts PASTEL.bright_green "Total pay before tax: #{PASTEL.bold.bright_green ("£#{shift_data[:pay_before_tax]}")}"
     puts "-" * 40
   end
 
